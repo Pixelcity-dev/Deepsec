@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepSec — All-in-one Cybersecurity CLI Tool</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a2e;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.3);
+            --green: #10b981;
+            --red: #ef4444;
+            --yellow: #f59e0b;
+            --orange: #f97316;
+            --cyan: #06b6d4;
+            --purple: #8b5cf6;
+            --text-primary: #f0f0f5;
+            --text-secondary: #9ca3af;
+            --border: #2a2a3e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Background Effects */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow-orb.blue {
+            width: 600px;
+            height: 600px;
+            background: var(--accent);
+            top: -200px;
+            right: -200px;
+        }
+
+        .glow-orb.purple {
+            width: 500px;
+            height: 500px;
+            background: var(--purple);
+            bottom: -150px;
+            left: -150px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            padding: 24px 0;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .logo-text span {
+            color: var(--accent);
+        }
+
+        nav {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: var(--text-primary);
+        }
+
+        .github-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .github-btn:hover {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 100px 0 80px;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 100px;
+            font-size: 13px;
+            color: var(--accent);
+            margin-bottom: 32px;
+        }
+
+        .hero-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .hero h1 {
+            font-size: 72px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 50%, var(--purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            color: white;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* Install Command */
+        .install-section {
+            margin-top: 48px;
+        }
+
+        .install-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 24px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+        }
+
+        .install-box .prompt {
+            color: var(--green);
+        }
+
+        .install-box .command {
+            color: var(--text-primary);
+            user-select: all;
+        }
+
+        .copy-btn {
+            padding: 8px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* Features */
+        .features {
+            padding: 100px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            padding: 32px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .feature-icon.sast { background: rgba(239, 68, 68, 0.1); }
+        .feature-icon.sca { background: rgba(249, 115, 22, 0.1); }
+        .feature-icon.secrets { background: rgba(245, 158, 11, 0.1); }
+        .feature-icon.iac { background: rgba(16, 185, 129, 0.1); }
+        .feature-icon.container { background: rgba(6, 182, 212, 0.1); }
+        .feature-icon.dast { background: rgba(139, 92, 246, 0.1); }
+
+        .feature-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        /* Code Example */
+        .code-section {
+            padding: 80px 0;
+            background: var(--bg-secondary);
+        }
+
+        .code-block {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .code-dot.red { background: #ff5f57; }
+        .code-dot.yellow { background: #febc2e; }
+        .code-dot.green { background: #28c840; }
+
+        .code-content {
+            padding: 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+
+        .code-content .comment { color: #6b7280; }
+        .code-content .command { color: #10b981; }
+        .code-content .flag { color: #3b82f6; }
+        .code-content .string { color: #f59e0b; }
+        .code-content .output { color: #9ca3af; }
+
+        /* Stats */
+        .stats {
+            padding: 80px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 32px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+
+        .stat-value {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Formats */
+        .formats {
+            padding: 80px 0;
+            background: var(--bg-secondary);
+        }
+
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+        }
+
+        .format-item {
+            padding: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .format-item:hover {
+            border-color: var(--accent);
+        }
+
+        .format-item .name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .format-item .ext {
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        footer p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 42px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="glow-orb blue"></div>
+    <div class="glow-orb purple"></div>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <div class="logo-icon">🔒</div>
+                    <div class="logo-text">Deep<span>Sec</span></div>
+                </a>
+                <nav>
+                    <a href="#features">Features</a>
+                    <a href="#install">Install</a>
+                    <a href="#formats">Formats</a>
+                    <a href="https://github.com/Pixelcity-dev/Deepsec" class="github-btn" target="_blank">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                        </svg>
+                        GitHub
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-badge">
+                <span class="dot"></span>
+                v1.0.0 — Now Available
+            </div>
+            <h1>All-in-one Cybersecurity CLI</h1>
+            <p>Scan your code, dependencies, containers, and infrastructure for security vulnerabilities. One binary, zero dependencies.</p>
+            <div class="hero-actions">
+                <a href="#install" class="btn btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Install Now
+                </a>
+                <a href="https://github.com/Pixelcity-dev/Deepsec" class="btn btn-secondary" target="_blank">
+                    View Source
+                </a>
+            </div>
+            <div class="install-section">
+                <div class="install-box">
+                    <span class="prompt">$</span>
+                    <span class="command" id="install-cmd">curl -sSL https://pixelcity.dev/deepsec/install.sh | sh</span>
+                    <button class="copy-btn" onclick="copyInstall()">Copy</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Comprehensive Security Scanning</h2>
+                <p>Eight specialized scanners working together to protect your codebase</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon sast">🔍</div>
+                    <h3>SAST</h3>
+                    <p>Static Application Security Testing for 11+ languages. Detect SQL injection, XSS, command injection, and more.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon sca">📦</div>
+                    <h3>SCA</h3>
+                    <p>Software Composition Analysis for 11 ecosystems. Find vulnerable dependencies before they reach production.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon secrets">🔑</div>
+                    <h3>Secrets</h3>
+                    <p>Detect leaked credentials, API keys, and private keys. 700+ patterns with entropy analysis.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon iac">🏗️</div>
+                    <h3>IaC</h3>
+                    <p>Infrastructure as Code scanning for Terraform, Kubernetes, Docker, and CloudFormation.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon container">🐳</div>
+                    <h3>Container</h3>
+                    <p>Container image scanning, Dockerfile analysis, and base image recommendations.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon dast">🌐</div>
+                    <h3>DAST</h3>
+                    <p>Dynamic Application Security Testing for running web applications. Check headers, TLS, cookies.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="code-section" id="install">
+        <div class="container">
+            <div class="section-header">
+                <h2>Get Started in Seconds</h2>
+                <p>One command to install, one command to scan</p>
+            </div>
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-dot red"></div>
+                    <div class="code-dot yellow"></div>
+                    <div class="code-dot green"></div>
+                </div>
+                <div class="code-content">
+                    <span class="comment"># Install DeepSec</span><br>
+                    <span class="command">$</span> curl -sSL https://pixelcity.dev/deepsec/install.sh | sh<br><br>
+                    <span class="comment"># Scan your project</span><br>
+                    <span class="command">$</span> deepsec scan . <span class="flag">--scanner</span> sast,sca,secrets<br><br>
+                    <span class="comment"># Output to SARIF for GitHub</span><br>
+                    <span class="command">$</span> deepsec scan . <span class="flag">--format</span> sarif <span class="flag">--output</span> results.sarif<br><br>
+                    <span class="comment"># Filter by severity</span><br>
+                    <span class="command">$</span> deepsec scan . <span class="flag">--severity</span> critical,high
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">8</div>
+                    <div class="stat-label">Security Scanners</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">11+</div>
+                    <div class="stat-label">Languages</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">700+</div>
+                    <div class="stat-label">Secret Patterns</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Dependencies</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="formats" id="formats">
+        <div class="container">
+            <div class="section-header">
+                <h2>11 Output Formats</h2>
+                <p>Integrate with any CI/CD pipeline or security platform</p>
+            </div>
+            <div class="format-grid">
+                <div class="format-item">
+                    <div class="name">Table</div>
+                    <div class="ext">terminal</div>
+                </div>
+                <div class="format-item">
+                    <div class="name">JSON</div>
+                    <div class="ext">.json</div>
+                </div>
+                <div class="format-item">
+                    <div class="name">SARIF</div>
+                    <div class="ext">.sarif</div>
+                </div>
+                <div class="format-item">
+                    <div class="name">CycloneDX</div>
+                    <div class="ext">.json</div>
+                </div>
+                <div class="format-item">
+                    <div class="name">SPDX</div>
+                    <div class="ext">.json</div>
+                </div>
+                <div class="format-item">
+                    <div class="name">HTML</div>
+                    <div class="ext">.html</div>
+                </div>
+                <div class="format-item">
+                    <div class="name">JUnit XML</div>
+                    <div class="ext">.xml</div>
+                </div>
+                <div class="format-item">
+                    <div class="name">CSV</div>
+                    <div class="ext">.csv</div>
+                </div>
+                <div class="format-item">
+                    <div class="name">GitHub</div>
+                    <div class="ext">snapshot</div>
+                </div>
+                <div class="format-item">
+                    <div class="name">GitLab</div>
+                    <div class="ext">report</div>
+                </div>
+                <div class="format-item">
+                    <div class="name">Custom</div>
+                    <div class="ext">template</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>DeepSec by <a href="https://pixelcity.dev">PixelCity</a> — Apache 2.0 License — <a href="https://github.com/Pixelcity-dev/Deepsec">GitHub</a></p>
+        </div>
+    </footer>
+
+    <script>
+        function copyInstall() {
+            const cmd = document.getElementById('install-cmd').textContent;
+            navigator.clipboard.writeText(cmd).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = 'Copy', 2000);
+            });
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

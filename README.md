@@ -24,7 +24,7 @@ DeepSec is a comprehensive security scanning tool that provides SAST, SCA, secre
 ### Binary Download
 
 ```bash
-curl -sSL https://deepsec.dev/install.sh | sh
+curl -sSL https://pixelcity.dev/deepsec/install.sh | sh
 ```
 
 ### Homebrew

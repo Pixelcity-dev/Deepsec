@@ -9,7 +9,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /deepsec ./cmd/deepsec
 
-FROM gcr.io/distroless/static-debian12
+FROM gcr.io/distroless/static-debian12:latest
 
 COPY --from=builder /deepsec /usr/local/bin/deepsec
 

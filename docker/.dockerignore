@@ -1,0 +1,15 @@
+.git
+.gitignore
+.github
+.vscode
+.idea
+*.md
+LICENSE
+Makefile
+bin/
+dist/
+coverage.out
+coverage.html
+plugins/
+docs/
+.deepsec/

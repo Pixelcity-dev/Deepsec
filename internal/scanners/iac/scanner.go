@@ -191,6 +191,11 @@ func scanDockerfile(path, content string) []core.Finding {
 		if strings.HasPrefix(strings.ToUpper(line), "COPY ") || strings.HasPrefix(strings.ToUpper(line), "ADD ") {
 			parts := strings.Fields(line)
 			if len(parts) >= 2 && parts[1] == "." {
+				dir := filepath.Dir(path)
+				dockerignore := filepath.Join(dir, ".dockerignore")
+				if _, err := os.Stat(dockerignore); err == nil {
+					continue
+				}
 				findings = append(findings, core.Finding{
 					RuleID:      "iac-dockerfile-copy-all",
 					Severity:    core.SeverityMedium,

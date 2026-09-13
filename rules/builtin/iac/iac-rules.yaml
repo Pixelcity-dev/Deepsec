@@ -1,0 +1,55 @@
+rules:
+  - id: iac-s3-public-acl
+    name: S3 Public ACL
+    severity: high
+    category: cloud-security
+    scanner_type: iac
+    description: S3 bucket configured with public access
+    fix: Use private ACL or implement bucket policies
+    references:
+      - https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-best-practices.html
+    tags:
+      - aws
+      - s3
+      - cloud-security
+    enabled: true
+
+  - id: iac-open-cidr
+    name: Open CIDR Block
+    severity: high
+    category: network-security
+    scanner_type: iac
+    description: Security group allows access from 0.0.0.0/0
+    fix: Restrict CIDR block to specific IP ranges
+    tags:
+      - aws
+      - security-group
+      - network
+    enabled: true
+
+  - id: iac-k8s-privileged
+    name: Privileged Container
+    severity: critical
+    category: container-security
+    scanner_type: iac
+    description: Container running in privileged mode
+    fix: Remove privileged: true and use specific capabilities
+    references:
+      - https://kubernetes.io/docs/concepts/security/pod-security-standards/
+    tags:
+      - kubernetes
+      - privileged
+      - container
+    enabled: true
+
+  - id: iac-dockerfile-no-version
+    name: Docker Image Without Version
+    severity: medium
+    category: container
+    scanner_type: iac
+    description: Docker image does not specify a version tag
+    fix: Use a specific version tag or digest
+    tags:
+      - docker
+      - dockerfile
+    enabled: true

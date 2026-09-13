@@ -1,0 +1,38 @@
+rules:
+  - id: sca-vulnerable-dependency
+    name: Vulnerable Dependency
+    severity: high
+    category: dependency
+    scanner_type: sca
+    description: Dependency with known vulnerabilities
+    fix: Update to a patched version
+    references:
+      - https://nvd.nist.gov/
+    tags:
+      - dependency
+      - cve
+    enabled: true
+
+  - id: sca-outdated-dependency
+    name: Outdated Dependency
+    severity: medium
+    category: dependency
+    scanner_type: sca
+    description: Dependency is significantly outdated
+    fix: Update to the latest stable version
+    tags:
+      - dependency
+      - outdated
+    enabled: true
+
+  - id: sca-deprecated-dependency
+    name: Deprecated Dependency
+    severity: medium
+    category: dependency
+    scanner_type: sca
+    description: Dependency is deprecated
+    fix: Migrate to an actively maintained alternative
+    tags:
+      - dependency
+      - deprecated
+    enabled: true

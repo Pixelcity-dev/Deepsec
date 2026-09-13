@@ -1,0 +1,52 @@
+name: 'DeepSec Security Scan'
+description: 'Run DeepSec security scanner on your codebase'
+author: 'Pixelcity'
+
+branding:
+  icon: 'shield'
+  color: 'blue'
+
+inputs:
+  scan-type:
+    description: 'Type of scan to run (sast, sca, secrets, iac, container, dast, network, license)'
+    required: false
+    default: 'sast,sca,secrets'
+  severity:
+    description: 'Minimum severity level to report'
+    required: false
+    default: 'low'
+  format:
+    description: 'Output format (sarif, json, table)'
+    required: false
+    default: 'sarif'
+  output:
+    description: 'Output file path'
+    required: false
+    default: 'deepsec-results.sarif'
+  upload-code-scanning:
+    description: 'Upload results to GitHub Code Scanning'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install DeepSec
+      shell: bash
+      run: |
+        curl -sSL https://deepsec.dev/install.sh | sh
+
+    - name: Run DeepSec Scan
+      shell: bash
+      run: |
+        deepsec scan . \
+          --scanner ${{ inputs.scan-type }} \
+          --severity ${{ inputs.severity }} \
+          --format ${{ inputs.format }} \
+          --output ${{ inputs.output }}
+
+    - name: Upload SARIF to GitHub Code Scanning
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ${{ inputs.output }}
+      if: inputs.upload-code-scanning == 'true' && always()

@@ -1,0 +1,162 @@
+package cli
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"time"
+
+	"github.com/spf13/cobra"
+	"github.com/Pixelcity-dev/Deepsec/internal/core"
+	"github.com/Pixelcity-dev/Deepsec/internal/reporter"
+)
+
+var (
+	scanOutput    string
+	scanFormats   []string
+	scanSeverity  string
+	scanScanners  []string
+	scanBaseline  string
+	scanExitCode  bool
+	scanRecursive bool
+)
+
+var scanCmd = &cobra.Command{
+	Use:   "scan [target]",
+	Short: "Run security scan on a target",
+	Long: `Scan a filesystem, repository, container image, or URL for security issues.
+Supports multiple scan types: SAST, SCA, secrets, IaC, container, DAST, network, and license.`,
+	Args: cobra.ExactArgs(1),
+	RunE: runScan,
+}
+
+func init() {
+	scanCmd.Flags().StringVarP(&scanOutput, "output", "o", "", "output file path")
+	scanCmd.Flags().StringSliceVarP(&scanFormats, "format", "f", []string{"table"}, "output format (table, json, sarif, cyclonedx, spdx, html, csv, junit)")
+	scanCmd.Flags().StringVar(&scanSeverity, "severity", "INFO", "minimum severity level (INFO, LOW, MEDIUM, HIGH, CRITICAL)")
+	scanCmd.Flags().StringSliceVar(&scanScanners, "scanner", nil, "specific scanners to use")
+	scanCmd.Flags().StringVar(&scanBaseline, "baseline", "", "baseline file for comparing results")
+	scanCmd.Flags().BoolVar(&scanExitCode, "exit-code", false, "exit with non-zero code if findings found")
+	scanCmd.Flags().BoolVarP(&scanRecursive, "recursive", "r", true, "scan recursively")
+	scanCmd.Flags().StringSlice("exclude", nil, "patterns to exclude")
+	scanCmd.Flags().StringSlice("include", nil, "patterns to include")
+
+	rootCmd.AddCommand(scanCmd)
+}
+
+func runScan(cmd *cobra.Command, args []string) error {
+	target := args[0]
+	start := time.Now()
+
+	fmt.Fprintf(os.Stderr, "DeepSec v1.0.0 - Scanning %s\n", target)
+
+	ruleEngine := core.NewRuleEngine()
+	ruleEngine.LoadRulesFromDir("rules")
+
+	pipeline := core.NewPipeline(registry, ruleEngine)
+
+	filter := core.NewFindingFilter()
+	filter.MinSeverity = core.ParseSeverity(scanSeverity)
+	pipeline.SetFilter(filter)
+
+	var scanTypes []core.ScanType
+	if len(scanScanners) > 0 {
+		for _, s := range scanScanners {
+			scanTypes = append(scanTypes, core.ScanType(s))
+		}
+	} else {
+		scanTypes = []core.ScanType{
+			core.ScanTypeSAST,
+			core.ScanTypeSCA,
+			core.ScanTypeSecrets,
+			core.ScanTypeIAC,
+			core.ScanTypeContainer,
+			core.ScanTypeLicense,
+		}
+	}
+
+	targetObj := core.Target{
+		Kind: core.TargetFS,
+		URI:  target,
+	}
+
+	if isURL(target) {
+		targetObj.Kind = core.TargetURL
+	} else if isContainerImage(target) {
+		targetObj.Kind = core.TargetImage
+	} else if isGitRepo(target) {
+		targetObj.Kind = core.TargetRepo
+	}
+
+	results, err := pipeline.Scan(context.Background(), targetObj, scanTypes)
+	if err != nil {
+		return fmt.Errorf("scan failed: %w", err)
+	}
+
+	duration := time.Since(start).Seconds()
+
+	totalFindings := 0
+	for _, r := range results {
+		totalFindings += len(r.Findings)
+	}
+
+	fmt.Fprintf(os.Stderr, "\nScan completed in %.2f seconds\n", duration)
+	fmt.Fprintf(os.Stderr, "Found %d issues\n", totalFindings)
+
+	for _, format := range scanFormats {
+		rpt := reporter.GetReporter(format)
+		if rpt == nil {
+			return fmt.Errorf("unknown format: %s", format)
+		}
+
+		output, err := rpt.Generate(results, reporter.ReportOptions{
+			Format: format,
+			Output: scanOutput,
+			Color:  !rootCmd.PersistentFlags().Changed("no-color"),
+		})
+		if err != nil {
+			return fmt.Errorf("failed to generate report: %w", err)
+		}
+
+		if scanOutput != "" {
+			ext := rpt.Extension()
+			filename := scanOutput
+			if ext != "" && len(scanFormats) > 1 {
+				filename = fmt.Sprintf("%s.%s", scanOutput, ext)
+			}
+			if err := os.WriteFile(filename, output, 0644); err != nil {
+				return fmt.Errorf("failed to write output: %w", err)
+			}
+			fmt.Fprintf(os.Stderr, "Report written to %s\n", filename)
+		} else {
+			fmt.Print(string(output))
+		}
+	}
+
+	if scanExitCode && totalFindings > 0 {
+		os.Exit(1)
+	}
+
+	return nil
+}
+
+func isURL(s string) bool {
+	return len(s) > 7 && (s[:7] == "http://" || s[:8] == "https://")
+}
+
+func isContainerImage(s string) bool {
+	return len(s) > 0 && (s[0] == '/' || contains(s, ".") || contains(s, ":"))
+}
+
+func isGitRepo(s string) bool {
+	return len(s) > 4 && (s[len(s)-4:] == ".git" || s[:4] == "git@" || contains(s, "github.com") || contains(s, "gitlab.com"))
+}
+
+func contains(s, substr string) bool {
+	for i := 0; i <= len(s)-len(substr); i++ {
+		if s[i:i+len(substr)] == substr {
+			return true
+		}
+	}
+	return false
+}

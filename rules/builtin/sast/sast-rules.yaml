@@ -1,0 +1,100 @@
+rules:
+  - id: sast-sql-injection
+    name: SQL Injection
+    severity: critical
+    category: injection
+    language: generic
+    scanner_type: sast
+    description: Detects potential SQL injection vulnerabilities
+    fix: Use parameterized queries or ORM methods instead of string concatenation
+    references:
+      - https://cwe.mitre.org/data/definitions/89.html
+      - https://owasp.org/www-community/attacks/SQL_Injection
+    tags:
+      - sql
+      - injection
+      - owasp-top10
+    enabled: true
+    pattern: "SELECT.*FROM.*+|INSERT.*INTO.*+|UPDATE.*SET.*+|DELETE.*FROM.*+"
+
+  - id: sast-xss-detection
+    name: Cross-Site Scripting (XSS)
+    severity: high
+    category: xss
+    language: generic
+    scanner_type: sast
+    description: Detects potential XSS vulnerabilities
+    fix: Sanitize user input and use context-aware encoding
+    references:
+      - https://cwe.mitre.org/data/definitions/79.html
+      - https://owasp.org/www-community/attacks/xss/
+    tags:
+      - xss
+      - injection
+      - owasp-top10
+    enabled: true
+    pattern: "innerHTML|document.write|eval(|setTimeout(|setInterval("
+
+  - id: sast-command-injection
+    name: Command Injection
+    severity: critical
+    category: injection
+    language: generic
+    scanner_type: sast
+    description: Detects potential command injection vulnerabilities
+    fix: Use language-specific APIs instead of shell commands
+    references:
+      - https://cwe.mitre.org/data/definitions/78.html
+    tags:
+      - command-injection
+      - os-command
+    enabled: true
+    pattern: "exec(|system(|os.system(|subprocess.call(|child_process"
+
+  - id: sast-path-traversal
+    name: Path Traversal
+    severity: high
+    category: path-traversal
+    language: generic
+    scanner_type: sast
+    description: Detects potential path traversal vulnerabilities
+    fix: Validate and sanitize file paths
+    references:
+      - https://cwe.mitre.org/data/definitions/22.html
+    tags:
+      - path-traversal
+      - directory-traversal
+    enabled: true
+    pattern: "\\.\\./|\\.\\.\\\\|readFile|open(|fopen("
+
+  - id: sast-insecure-crypto
+    name: Insecure Cryptographic Algorithm
+    severity: medium
+    category: cryptography
+    language: generic
+    scanner_type: sast
+    description: Detects use of insecure cryptographic algorithms
+    fix: Use modern cryptographic algorithms (AES-256, SHA-256, RSA-2048+)
+    references:
+      - https://cwe.mitre.org/data/definitions/327.html
+    tags:
+      - cryptography
+      - weak-crypto
+    enabled: true
+    pattern: "MD5|SHA1|DES|RC4|ECB"
+
+  - id: sast-hardcoded-credential
+    name: Hardcoded Credential
+    severity: high
+    category: credentials
+    language: generic
+    scanner_type: sast
+    description: Detects potential hardcoded credentials
+    fix: Use environment variables or secrets management
+    references:
+      - https://cwe.mitre.org/data/definitions/798.html
+    tags:
+      - credentials
+      - hardcoded
+    enabled: true
+    pattern: "password\\s*=\\s*['\"]|secret\\s*=\\s*['\"]|api_key\\s*=\\s*['\"]"

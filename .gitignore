@@ -1,0 +1,31 @@
+# Binaries
+bin/
+dist/
+
+# Test
+coverage.out
+coverage.html
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies
+vendor/
+
+# Build
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# DeepSec
+.deepsec/
+.deepsec.yaml

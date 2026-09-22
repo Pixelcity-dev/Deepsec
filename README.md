@@ -39,14 +39,6 @@ INSTALL_DIR=/usr/local/bin curl -fsSL https://cdn.pixelcity.dev/deepsec/install.
 curl -fsSL https://cdn.pixelcity.dev/deepsec/install.sh | sh -s -- --help
 ```
 
-### Docker
-
-```bash
-docker pull pixelcity/deepsec:latest
-docker run --rm pixelcity/deepsec --help
-docker run --rm -v $(pwd):/app pixelcity/deepsec scan /app
-```
-
 ### Go Install
 
 ```bash

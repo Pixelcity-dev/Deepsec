@@ -25,7 +25,13 @@ var scanCmd = &cobra.Command{
 	Use:   "scan [target]",
 	Short: "Run security scan on a target",
 	Long: `Scan a filesystem, repository, container image, or URL for security issues.
-Supports multiple scan types: SAST, SCA, secrets, IaC, container, DAST, network, and license.`,
+Supports multiple scan types: SAST, SCA, secrets, IaC, container, DAST, webscan, network, and license.
+
+Examples:
+  deepsec scan ./myapp
+  deepsec scan https://example.com --scanner webscan
+  deepsec scan https://example.com --scanner dast,webscan
+  deepsec webscan https://example.com   # deep website audit (recommended for URLs)`,
 	Args: cobra.ExactArgs(1),
 	RunE: runScan,
 }
@@ -62,16 +68,30 @@ func runScan(cmd *cobra.Command, args []string) error {
 	var scanTypes []core.ScanType
 	if len(scanScanners) > 0 {
 		for _, s := range scanScanners {
-			scanTypes = append(scanTypes, core.ScanType(s))
+			// normalize aliases: website -> webscan, audit -> webscan
+			norm := s
+			if norm == "website" || norm == "audit" || norm == "wscan" {
+				norm = string(core.ScanTypeWebScan)
+			}
+			scanTypes = append(scanTypes, core.ScanType(norm))
 		}
 	} else {
-		scanTypes = []core.ScanType{
-			core.ScanTypeSAST,
-			core.ScanTypeSCA,
-			core.ScanTypeSecrets,
-			core.ScanTypeIAC,
-			core.ScanTypeContainer,
-			core.ScanTypeLicense,
+		// Auto-detect target type and set sensible defaults
+		if isURL(target) {
+			scanTypes = []core.ScanType{
+				core.ScanTypeDAST,
+				core.ScanTypeWebScan,
+				core.ScanTypeNetwork,
+			}
+		} else {
+			scanTypes = []core.ScanType{
+				core.ScanTypeSAST,
+				core.ScanTypeSCA,
+				core.ScanTypeSecrets,
+				core.ScanTypeIAC,
+				core.ScanTypeContainer,
+				core.ScanTypeLicense,
+			}
 		}
 	}
 
@@ -82,6 +102,7 @@ func runScan(cmd *cobra.Command, args []string) error {
 
 	if isURL(target) {
 		targetObj.Kind = core.TargetURL
+		// for URL targets, ensure webscan/dast are included even if not requested? already handled
 	} else if isContainerImage(target) {
 		targetObj.Kind = core.TargetImage
 	} else if isGitRepo(target) {

@@ -27,6 +27,7 @@ type ScannerConfig struct {
 	DAST      bool `yaml:"dast" json:"dast"`
 	Network   bool `yaml:"network" json:"network"`
 	License   bool `yaml:"license" json:"license"`
+	WebScan   bool `yaml:"webscan" json:"webscan"`
 }
 
 type ReportConfig struct {
@@ -62,11 +63,65 @@ type ServerConfig struct {
 }
 
 type FilterConfig struct {
-	MinSeverity     string   `yaml:"min_severity" json:"min_severity"`
-	ExcludeRules    []string `yaml:"exclude_rules,omitempty" json:"exclude_rules,omitempty"`
-	IncludeRules    []string `yaml:"include_rules,omitempty" json:"include_rules,omitempty"`
-	ExcludeFiles    []string `yaml:"exclude_files,omitempty" json:"exclude_files,omitempty"`
+	MinSeverity       string   `yaml:"min_severity" json:"min_severity"`
+	ExcludeRules      []string `yaml:"exclude_rules,omitempty" json:"exclude_rules,omitempty"`
+	IncludeRules      []string `yaml:"include_rules,omitempty" json:"include_rules,omitempty"`
+	ExcludeFiles      []string `yaml:"exclude_files,omitempty" json:"exclude_files,omitempty"`
 	ExcludeCategories []string `yaml:"exclude_categories,omitempty" json:"exclude_categories,omitempty"`
+	Profile           string   `yaml:"profile,omitempty" json:"profile,omitempty"`
+	Compliance        []string `yaml:"compliance,omitempty" json:"compliance,omitempty"`
+	FailOn            string   `yaml:"fail_on,omitempty" json:"fail_on,omitempty"`
+}
+
+type ComplianceMapping struct {
+	OWASP    string `yaml:"owasp" json:"owasp"`
+	CWE      string `yaml:"cwe" json:"cwe"`
+	SOC2     string `yaml:"soc2" json:"soc2"`
+	ISO27001 string `yaml:"iso27001" json:"iso27001"`
+}
+
+var ComplianceByCategory = map[string]ComplianceMapping{
+	"security-headers":       {OWASP: "A05:2021", CWE: "693", SOC2: "CC6.1", ISO27001: "A.14.2.5"},
+	"transport-security":     {OWASP: "A01:2021", CWE: "326", SOC2: "CC6.6", ISO27001: "A.10.1.1"},
+	"cookie-security":        {OWASP: "A01:2021", CWE: "614", SOC2: "CC6.1", ISO27001: "A.14.1.3"},
+	"cors":                   {OWASP: "A01:2021", CWE: "942", SOC2: "CC6.6", ISO27001: "A.13.2.1"},
+	"information-disclosure": {OWASP: "A01:2021", CWE: "200", SOC2: "CC6.1", ISO27001: "A.18.1.3"},
+	"clickjacking":           {OWASP: "A01:2021", CWE: "1021", SOC2: "CC6.1", ISO27001: "A.14.2.5"},
+	"open-redirect":          {OWASP: "A01:2021", CWE: "601", SOC2: "CC6.1", ISO27001: "A.14.2.1"},
+	"xss":                    {OWASP: "A03:2021", CWE: "79", SOC2: "CC6.1", ISO27001: "A.14.2.5"},
+	"injection":              {OWASP: "A03:2021", CWE: "89", SOC2: "CC6.1", ISO27001: "A.14.2.5"},
+	"secrets":                {OWASP: "A07:2021", CWE: "798", SOC2: "CC6.1", ISO27001: "A.9.4.3"},
+	"sast":                   {OWASP: "A03:2021", CWE: "20", SOC2: "CC7.2", ISO27001: "A.14.2.1"},
+	"sca":                    {OWASP: "A06:2021", CWE: "1104", SOC2: "CC7.2", ISO27001: "A.14.2.7"},
+}
+
+func ProfileConfig(profile string) *Config {
+	cfg := DefaultConfig()
+	switch profile {
+	case "startup":
+		cfg.Filter.MinSeverity = "LOW"
+		cfg.Report.Format = "table"
+	case "business":
+		cfg.Filter.MinSeverity = "MEDIUM"
+		cfg.Filter.Compliance = []string{"soc2", "owasp"}
+		cfg.Report.Format = "sarif"
+		cfg.Filter.FailOn = "HIGH"
+	case "enterprise":
+		cfg.Filter.MinSeverity = "LOW"
+		cfg.Filter.Compliance = []string{"soc2", "iso27001", "gdpr", "owasp"}
+		cfg.Report.Format = "html"
+		cfg.Filter.FailOn = "MEDIUM"
+		cfg.Scanners.SAST = true
+		cfg.Scanners.SCA = true
+		cfg.Scanners.Secrets = true
+		cfg.Scanners.IAC = true
+		cfg.Scanners.Container = true
+		cfg.Scanners.DAST = true
+		cfg.Scanners.WebScan = true
+		cfg.Scanners.Network = true
+		cfg.Scanners.License = true
+	}
+	return cfg
 }
 
 func DefaultConfig() *Config {
@@ -85,6 +140,7 @@ func DefaultConfig() *Config {
 			DAST:      true,
 			Network:   true,
 			License:   true,
+			WebScan:   true,
 		},
 		Report: ReportConfig{
 			Format: "table",
@@ -194,5 +250,8 @@ func (c *Config) MergeWith(other *Config) {
 	}
 	if other.Scanners.License {
 		c.Scanners.License = true
+	}
+	if other.Scanners.WebScan {
+		c.Scanners.WebScan = true
 	}
 }

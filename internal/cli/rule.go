@@ -106,7 +106,7 @@ func runRuleSearch(cmd *cobra.Command, args []string) error {
 	query := args[0]
 	matches := rules.SearchRules(query)
 
-	fmt.Printf("Found %d rules matching '%s':\n\n", query, len(matches))
+	fmt.Printf("Found %d rules matching '%s':\n\n", len(matches), query)
 	for _, r := range matches {
 		fmt.Printf("%-50s %s\n", r.ID, r.Name)
 	}

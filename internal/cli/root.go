@@ -15,6 +15,7 @@ import (
 	"github.com/Pixelcity-dev/Deepsec/internal/scanners/sast"
 	"github.com/Pixelcity-dev/Deepsec/internal/scanners/sca"
 	"github.com/Pixelcity-dev/Deepsec/internal/scanners/secrets"
+	"github.com/Pixelcity-dev/Deepsec/internal/scanners/webscan"
 )
 
 var (
@@ -23,13 +24,36 @@ var (
 	registry *core.ScannerRegistry
 )
 
+var (
+	version = "1.0.0"
+	buildTime = "unknown"
+	commit = "dev"
+)
+
 var rootCmd = &cobra.Command{
 	Use:   "deepsec",
-	Short: "DeepSec - All-in-one Cybersecurity CLI Tool",
-	Long: `DeepSec is a comprehensive security scanning tool for developers and enterprises.
-It provides SAST, SCA, secrets detection, IaC scanning, container security,
-DAST, network scanning, and license compliance in a single binary.`,
-	Version: "1.0.0",
+	Short: "DeepSec — Cyber Security Enterprise Tool",
+	Long: `DeepSec — Cyber Security Enterprise Tool
+
+All-in-one security platform. One binary, zero dependencies, covers code + supply chain + cloud + web.
+
+CAPABILITIES
+  Code & Supply Chain  SAST (11+ langs: Go, Java, JS/TS, Python, Rust, PHP, Ruby, C/C++, C#, Kotlin, Swift)
+                      SCA (11+ ecosystems: npm, pip, Maven, Go, Cargo, Composer, NuGet, etc.)
+                      Secrets (200+ patterns, entropy + verified), License (SPDX/CycloneDX)
+  Cloud & Containers   IaC (Terraform, CloudFormation, K8s, Dockerfile), Container (image & Dockerfile), Network
+  Web & API            DAST + WebScan (OWASP Top 10, 20+ deep checks: headers, TLS, CORS, CSP, auth, etc.)
+
+EXAMPLES
+  deepsec scan .                                      # scan current repo
+  deepsec scan . --severity high --exit-code           # gate on high/critical
+  deepsec webscan https://example.com --format sarif --output ws.sarif
+  deepsec scan https://example.com --scanner webscan,dast --compliance soc2
+  deepsec scan ./app --format html --output report.html
+
+Learn more: https://pixelcity.top/deepsec  •  Docs: https://pixelcity.top/docs/deepsec
+Support: enterprise@pixelcity.dev  •  MCP: deepsec mcp start for AI agents`,
+	Version: version,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		initConfig()
 		initScanners()
@@ -44,10 +68,17 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default: .deepsec.yaml)")
-	rootCmd.PersistentFlags().Bool("no-color", false, "disable colored output")
-	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
-	rootCmd.PersistentFlags().BoolP("quiet", "q", false, "quiet mode - only output errors")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default: .deepsec.yaml, $HOME/.config/deepsec/config.yaml)")
+	rootCmd.PersistentFlags().Bool("no-color", false, "disable ANSI colors (CI)")
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose diagnostics")
+	rootCmd.PersistentFlags().BoolP("quiet", "q", false, "quiet — errors only")
+	rootCmd.PersistentFlags().String("profile", "", "profile (enterprise) — overrides scanners & thresholds")
+	rootCmd.PersistentFlags().String("compliance", "", "compliance mapping: soc2, iso27001, gdpr, hipaa, owasp")
+	rootCmd.SetVersionTemplate(`DeepSec {{.Version}} ({{.Name}}) — Cyber Security Enterprise Tool
+  commit: ` + commit + `
+  built:  ` + buildTime + `
+  scanners: 8  •  langs: 11+  •  https://pixelcity.top/docs/deepsec
+`)
 }
 
 func initConfig() {
@@ -99,5 +130,11 @@ func initScanners() {
 	}
 	if cfg.Scanners.License {
 		registry.Register(license.NewLicenseScanner())
+	}
+	if cfg.Scanners.WebScan {
+		registry.Register(webscan.NewWebScanScanner())
+	} else {
+		// always register webscan even if disabled in config, so --scanner webscan works
+		registry.Register(webscan.NewWebScanScanner())
 	}
 }

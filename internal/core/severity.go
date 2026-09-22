@@ -92,6 +92,25 @@ func (s Severity) Weight() int {
 	return int(s)
 }
 
+func RiskScore(findings []Finding) (score int, level string) {
+	weights := map[Severity]int{SeverityCritical: 40, SeverityHigh: 10, SeverityMedium: 3, SeverityLow: 1, SeverityInfo: 0}
+	for _, f := range findings {
+		score += weights[f.Severity]
+	}
+	switch {
+	case score == 0:
+		return 0, "Excellent"
+	case score < 5:
+		return score, "Low"
+	case score < 20:
+		return score, "Medium"
+	case score < 50:
+		return score, "High"
+	default:
+		return score, "Critical"
+	}
+}
+
 func FormatSeverity(s Severity) string {
 	color := s.Color()
 	reset := "\033[0m"

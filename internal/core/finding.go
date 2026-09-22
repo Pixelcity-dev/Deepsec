@@ -18,6 +18,7 @@ const (
 	ScanTypeDAST      ScanType = "dast"
 	ScanTypeNetwork   ScanType = "network"
 	ScanTypeLicense   ScanType = "license"
+	ScanTypeWebScan   ScanType = "webscan"
 )
 
 type TargetKind string

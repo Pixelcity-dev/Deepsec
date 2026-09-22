@@ -6,9 +6,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/spf13/cobra"
 	"github.com/Pixelcity-dev/Deepsec/internal/core"
 	"github.com/Pixelcity-dev/Deepsec/internal/reporter"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -54,7 +54,7 @@ func runScan(cmd *cobra.Command, args []string) error {
 	target := args[0]
 	start := time.Now()
 
-	fmt.Fprintf(os.Stderr, "DeepSec v1.0.0 - Scanning %s\n", target)
+	fmt.Fprintf(os.Stderr, "DeepSec v%s - Scanning %s\n", version, target)
 
 	ruleEngine := core.NewRuleEngine()
 	ruleEngine.LoadRulesFromDir("rules")

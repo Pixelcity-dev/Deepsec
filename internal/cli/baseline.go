@@ -41,9 +41,9 @@ func runBaselineCreate(cmd *cobra.Command, args []string) error {
 	fmt.Println("Creating baseline...")
 
 	baseline := map[string]interface{}{
-		"version":   "1.0.0",
-		"created":   time.Now().Format(time.RFC3339),
-		"findings":  []string{},
+		"version":  "1.1.0",
+		"created":  time.Now().Format(time.RFC3339),
+		"findings": []string{},
 	}
 
 	_ = baseline

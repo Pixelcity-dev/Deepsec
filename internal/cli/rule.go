@@ -5,17 +5,17 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/spf13/cobra"
 	"github.com/Pixelcity-dev/Deepsec/internal/core"
+	"github.com/spf13/cobra"
 )
 
 var (
-	ruleSearchQ   string
-	ruleLanguage  string
-	ruleCategory  string
-	ruleSeverity  string
-	ruleEnabled   bool
-	rules         *core.RuleEngine
+	ruleSearchQ  string
+	ruleLanguage string
+	ruleCategory string
+	ruleSeverity string
+	ruleEnabled  bool
+	rules        *core.RuleEngine
 )
 
 var ruleCmd = &cobra.Command{

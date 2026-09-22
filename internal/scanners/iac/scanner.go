@@ -69,13 +69,13 @@ func isIACFile(path string) bool {
 	ext := filepath.Ext(path)
 
 	iacFiles := map[string]bool{
-		"Dockerfile":              true,
-		"docker-compose.yml":      true,
-		"docker-compose.yaml":     true,
-		".dockerignore":           true,
-		"Makefile":                true,
-		"Vagrantfile":             true,
-		"Jenkinsfile":             true,
+		"Dockerfile":          true,
+		"docker-compose.yml":  true,
+		"docker-compose.yaml": true,
+		".dockerignore":       true,
+		"Makefile":            true,
+		"Vagrantfile":         true,
+		"Jenkinsfile":         true,
 	}
 
 	iacExtensions := map[string]bool{

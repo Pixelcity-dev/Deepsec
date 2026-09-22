@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/spf13/cobra"
 	"github.com/Pixelcity-dev/Deepsec/internal/config"
 	"github.com/Pixelcity-dev/Deepsec/internal/core"
 	"github.com/Pixelcity-dev/Deepsec/internal/scanners/container"
 	"github.com/Pixelcity-dev/Deepsec/internal/scanners/dast"
+	"github.com/Pixelcity-dev/Deepsec/internal/scanners/format"
 	"github.com/Pixelcity-dev/Deepsec/internal/scanners/iac"
 	"github.com/Pixelcity-dev/Deepsec/internal/scanners/license"
 	"github.com/Pixelcity-dev/Deepsec/internal/scanners/network"
@@ -16,6 +16,7 @@ import (
 	"github.com/Pixelcity-dev/Deepsec/internal/scanners/sca"
 	"github.com/Pixelcity-dev/Deepsec/internal/scanners/secrets"
 	"github.com/Pixelcity-dev/Deepsec/internal/scanners/webscan"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -25,9 +26,9 @@ var (
 )
 
 var (
-	version = "1.0.0"
+	version   = "1.1.0"
 	buildTime = "unknown"
-	commit = "dev"
+	commit    = "dev"
 )
 
 var rootCmd = &cobra.Command{
@@ -35,7 +36,7 @@ var rootCmd = &cobra.Command{
 	Short: "DeepSec — Cyber Security Enterprise Tool",
 	Long: `DeepSec — Cyber Security Enterprise Tool
 
-All-in-one security platform. One binary, zero dependencies, covers code + supply chain + cloud + web.
+All-in-one security platform. One binary, zero dependencies, covers code + supply chain + cloud + web + formatting.
 
 CAPABILITIES
   Code & Supply Chain  SAST (11+ langs: Go, Java, JS/TS, Python, Rust, PHP, Ruby, C/C++, C#, Kotlin, Swift)
@@ -43,10 +44,13 @@ CAPABILITIES
                       Secrets (200+ patterns, entropy + verified), License (SPDX/CycloneDX)
   Cloud & Containers   IaC (Terraform, CloudFormation, K8s, Dockerfile), Container (image & Dockerfile), Network
   Web & API            DAST + WebScan (OWASP Top 10, 20+ deep checks: headers, TLS, CORS, CSP, auth, etc.)
+  Quality              Format (7 checks: trailing ws, EOF newline, CRLF, mixed indent, long lines, gofmt, blanks) • deepsec fmt
 
 EXAMPLES
   deepsec scan .                                      # scan current repo
   deepsec scan . --severity high --exit-code           # gate on high/critical
+  deepsec fmt . --check                               # formatting gate (CI)
+  deepsec fmt . --fix                                 # auto-fix formatting
   deepsec webscan https://example.com --format sarif --output ws.sarif
   deepsec scan https://example.com --scanner webscan,dast --compliance soc2
   deepsec scan ./app --format html --output report.html
@@ -77,7 +81,7 @@ func init() {
 	rootCmd.SetVersionTemplate(`DeepSec {{.Version}} ({{.Name}}) — Cyber Security Enterprise Tool
   commit: ` + commit + `
   built:  ` + buildTime + `
-  scanners: 8  •  langs: 11+  •  https://pixelcity.top/docs/deepsec
+  scanners: 9  •  langs: 11+  •  https://pixelcity.top/docs/deepsec
 `)
 }
 
@@ -131,10 +135,17 @@ func initScanners() {
 	if cfg.Scanners.License {
 		registry.Register(license.NewLicenseScanner())
 	}
+	if cfg.Scanners.Format {
+		registry.Register(format.NewFormatScanner())
+	}
 	if cfg.Scanners.WebScan {
 		registry.Register(webscan.NewWebScanScanner())
 	} else {
 		// always register webscan even if disabled in config, so --scanner webscan works
 		registry.Register(webscan.NewWebScanScanner())
+	}
+	// Ensure format is always available for --scanner format even if disabled
+	if _, ok := registry.Get(core.ScanTypeFormat); !ok {
+		registry.Register(format.NewFormatScanner())
 	}
 }

@@ -130,18 +130,18 @@ func analyzeFile(path, content string, rule core.Rule, lang string) []core.Findi
 	for i, line := range lines {
 		if matchRule(line, rule) {
 			finding := core.Finding{
-				RuleID:     rule.ID,
-				Severity:   rule.Severity,
-				Category:   rule.Category,
-				Title:      rule.Name,
+				RuleID:      rule.ID,
+				Severity:    rule.Severity,
+				Category:    rule.Category,
+				Title:       rule.Name,
 				Description: rule.Description,
-				File:       path,
-				Line:       i + 1,
-				Code:       strings.TrimSpace(line),
-				Fix:        rule.Fix,
-				References: rule.References,
-				Tags:       rule.Tags,
-				Confidence: 0.8,
+				File:        path,
+				Line:        i + 1,
+				Code:        strings.TrimSpace(line),
+				Fix:         rule.Fix,
+				References:  rule.References,
+				Tags:        rule.Tags,
+				Confidence:  0.8,
 			}
 			finding.GenerateFingerprint()
 			findings = append(findings, finding)

@@ -3,12 +3,17 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Pixelcity-dev/Deepsec)](https://goreportcard.com/report/github.com/Pixelcity-dev/Deepsec)
 [![Release](https://img.shields.io/github/v/release/Pixelcity-dev/Deepsec)](https://github.com/Pixelcity-dev/Deepsec/releases)
+[![PixelCity](https://img.shields.io/badge/by-PixelCity-%23d4a853?labelColor=%23080707)](https://pixelcity.top)
+[![Formatter](https://img.shields.io/badge/formatter-deepsec%20fmt-blue)](https://pixelcity.top/docs/deepsec#formatter)
 
-**Cyber Security Enterprise Tool — code, supply chain, cloud and web in one binary.**
+**Cyber Security Enterprise Tool — code, supply chain, cloud, web and formatting in one binary.**
 
-DeepSec unifies **SAST, SCA, Secrets, IaC, Containers, DAST, WebScan, Network, License & SBOM** for **any language** and **any webpage**. Zero dependencies, <50ms startup, compliance-ready (SOC 2, ISO 27001, GDPR, OWASP, CWE).
+DeepSec unifies **SAST, SCA, Secrets, IaC, Containers, DAST, WebScan, Network, License & SBOM** for **any language** and **any webpage** — plus a zero-dependency **Formatter** (`deepsec fmt`). Zero dependencies, <50ms startup, compliance-ready (SOC 2, ISO 27001, GDPR, OWASP, CWE).
 
-## Features — Any Language. Any Webpage.
+> **Made by [PixelCity](https://pixelcity.top) — Your Cloud, Your Rules.**
+> Open source under **Apache 2.0**. Public since **v1.1.0**. Contributions welcome.
+
+## Features — Any Language. Any Webpage. Now Formatted.
 
 - **SAST** — 11+ langs: Go, Java, JS/TS, Python, Rust, PHP, Ruby, C/C++, C#, Kotlin, Swift • OWASP A03
 - **SCA** — 11+ ecosystems: npm, pip, Maven, Go, Cargo, Composer, NuGet, RubyGems • OWASP A06
@@ -20,6 +25,7 @@ DeepSec unifies **SAST, SCA, Secrets, IaC, Containers, DAST, WebScan, Network, L
 - **Network** — Port/service, TLS, header audit
 - **License & SBOM** — SPDX/CycloneDX, license compliance
 - **Any Webpage** — `deepsec webscan https://example.com` audits marketing sites, SaaS apps, APIs, SPAs
+- **Formatter** — 7 checks, auto-fix, zero-config • `deepsec fmt` (`format` alias) — trailing whitespace, missing EOF newline, CRLF, mixed indentation, long lines (>120), Go `gofmt`, consecutive blanks • `<10ms` for 1000 files, no `prettier`/`black` required
 
 ## Installation
 
@@ -49,7 +55,6 @@ go install github.com/Pixelcity-dev/Deepsec/cmd/deepsec@latest
 
 ```bash
 git clone https://github.com/Pixelcity-dev/Deepsec.git
-# private SSH
 git clone git@github.com:Pixelcity-dev/Deepsec.git
 cd Deepsec
 make build
@@ -59,8 +64,8 @@ sudo make install
 ### Manual Download
 
 ```bash
-# https://cdn.pixelcity.dev/deepsec/releases/v1.0.0/
-curl -fsSL https://cdn.pixelcity.dev/deepsec/releases/v1.0.0/deepsec-linux-amd64 -o deepsec
+# https://cdn.pixelcity.dev/deepsec/releases/v1.1.0/
+curl -fsSL https://cdn.pixelcity.dev/deepsec/releases/v1.1.0/deepsec-linux-amd64 -o deepsec
 chmod +x deepsec && sudo mv deepsec /usr/local/bin/
 ```
 
@@ -74,6 +79,11 @@ deepsec scan .
 
 # Specific scanners
 deepsec scan . --scanner sast,sca,secrets
+
+# Formatting — check & fix
+deepsec fmt . --check          # CI gate, exit 1 if unformatted
+deepsec fmt . --fix            # auto-fix in place
+deepsec scan . --scanner format --format table  # as scanner
 
 # Deep Website Scan — 20+ checks
 deepsec webscan https://example.com
@@ -99,6 +109,7 @@ deepsec db update
 |---------|-------------|
 | `deepsec scan [target]` | Scan `fs`/`url`/`image`/`repo` — auto-detects target |
 | `deepsec webscan [url]` | Deep website audit — 20+ OWASP checks (`website`/`audit`/`wscan` aliases) |
+| `deepsec fmt [target]` | Check & fix formatting — 7 checks, auto-fix (`format`/`style` aliases) |
 | `deepsec init` | Scaffold `.deepsec.yaml` |
 | `deepsec db update` | Update NVD/OSV DB (air-gapped cache) |
 | `deepsec rule list/search` | 1000+ rules, filter by `language/category/severity` |
@@ -109,17 +120,62 @@ deepsec db update
 
 Exit codes: `0` pass, `1` gate failed, `2` error. Flags: `--severity`, `--format`, `--output`, `--profile`, `--compliance`, `--fail-on`, `--no-color`.
 
+## Formatter — `deepsec fmt`
+
+Zero-dependency formatter for any language, zero config. Ideal for `pixelcity.top` style fixes and CI gates.
+
+```bash
+deepsec fmt . --check                # check, exit 1 if issues
+deepsec fmt . --fix                  # fix: trailing ws, EOF newline, CRLF→LF, blank lines, gofmt
+deepsec fmt ./web --fix              # fix specific directory
+deepsec fmt . --diff                 # show findings without writing
+deepsec scan . --scanner format      # use as scanner (table/json/sarif)
+deepsec scan . --scanner format,sast # combine with security
+```
+
+**7 checks** (all `INFO`/`LOW`, category `formatting`/`style`, CWE-710):
+
+| Rule ID | Title | Auto-fix |
+|---------|-------|----------|
+| `fmt-trailing-whitespace` | Trailing spaces/tabs | ✅ |
+| `fmt-missing-eof-newline` | Missing newline at EOF | ✅ |
+| `fmt-crlf-line-ending` | CRLF → LF | ✅ |
+| `fmt-mixed-indentation` | Spaces + tabs mixed | ⚠️ suggest |
+| `fmt-consecutive-blank-lines` | >1 blank lines | ✅ |
+| `fmt-gofmt` | Go not `gofmt`'d (stdlib `go/format`) | ✅ |
+| `fmt-line-too-long` | >120 chars | ⚠️ suggest |
+
+**Languages:** Go, JS/TS, TSX, Python, Rust, PHP, Ruby, C/C++, C#, Kotlin, Swift, CSS, HTML, Vue, Svelte, JSON, YAML, TOML, MD, Shell, SQL, GraphQL, Dockerfile, Makefile.
+
+**CI gate:**
+
+```yaml
+- run: deepsec fmt . --check   # fails if unformatted
+- run: deepsec scan . --scanner format,sast --fail-on LOW
+```
+
+**Fix example (pixelcity-web):**
+
+```bash
+deepsec fmt . --fix
+# Fixed src/components/sections/HeroSection.tsx
+# Fixed src/app/globals.css
+# Checked 127 files, fixed 3 — 0.03s
+```
+
+Alternatives: `make fmt` (`gofmt -s -w .`) remains available; `deepsec fmt` covers all languages in one binary.
+
 ## Configuration
 
 ```yaml
-version: "1.0.0"
-scanners: { sast: true, sca: true, secrets: true, iac: true, container: true, dast: true, webscan: true, network: true, license: true }
+version: "1.1.0"
+scanners: { sast: true, sca: true, secrets: true, iac: true, container: true, dast: true, webscan: true, network: true, license: true, format: true }
 report: { format: html, color: true }   # table|json|sarif|cyclonedx|spdx|html|junit|csv
 filter:
   min_severity: low          # INFO|LOW|MEDIUM|HIGH|CRITICAL
   fail_on: HIGH              # gate for CI
   compliance: [soc2, iso27001, gdpr, owasp]
-  exclude_rules: [webscan-missing-security-txt]
+  exclude_rules: [webscan-missing-security-txt, fmt-line-too-long]
 ```
 
 CLI overrides: `--profile enterprise --compliance soc2 --fail-on high --severity medium`
@@ -154,9 +210,9 @@ deepsec scan https://example.com --scanner webscan --format sarif
 
 Example output (pixelcity.top):
 ```
-DeepSec WebScan v1.0.0 - Deep website audit on https://pixelcity.top
-WebScan completed in 1.36 seconds
-Found 7 issues  MEDIUM:1 LOW:5 INFO:1
+DeepSec WebScan v1.1.0 - Deep website audit on https://pixelcity.top
+WebScan completed in 0.27 seconds
+Found 2 issues  MEDIUM:1 LOW:1
 ```
 
 ## Reporting & Compliance
@@ -168,6 +224,7 @@ deepsec scan . --format html --output report.html
 deepsec scan . --format sarif --output results.sarif
 deepsec scan . --format cyclonedx --output sbom.json
 deepsec webscan https://example.com --compliance soc2 --format html --output ws.html
+deepsec fmt . --check --format sarif --output fmt.sarif
 ```
 
 ## CI/CD
@@ -177,7 +234,7 @@ deepsec webscan https://example.com --compliance soc2 --format html --output ws.
 ```yaml
 - uses: deepsec/deepsec-action@v1
   with:
-    scan-type: 'sast,sca,secrets,webscan'
+    scan-type: 'sast,sca,secrets,webscan,format'
     severity: 'high,critical'
     compliance: 'soc2,owasp'
     format: 'sarif'
@@ -191,6 +248,7 @@ deepsec webscan https://example.com --compliance soc2 --format html --output ws.
 deepsec:
   image: deepsec/deepsec:latest
   script:
+    - deepsec fmt . --check            # formatting gate
     - deepsec scan . --profile enterprise --format sarif --output gl-sast.json
     - deepsec scan . --format cyclonedx --output sbom.json
   artifacts: { reports: { sast: gl-sast.json }, paths: [sbom.json] }
@@ -201,15 +259,18 @@ deepsec:
 ```yaml
 repos:
   - repo: https://github.com/Pixelcity-dev/Deepsec
-    rev: v1.0.0
-    hooks: [{id: deepsec-secrets}, {id: deepsec-sast}]
+    rev: v1.1.0
+    hooks:
+      - {id: deepsec-secrets}
+      - {id: deepsec-sast}
+      - {id: deepsec-format}   # fmt --check
 ```
 
 ### Policy Gate
 
 ```bash
 deepsec scan . --fail-on HIGH
-deepsec scan . --fail-on MEDIUM
+deepsec fmt . --check          # or --fail-on LOW for style
 ```
 
 ## Output Formats
@@ -239,7 +300,7 @@ deepsec plugin list
 deepsec mcp start   # stdio/SSE
 ```
 
-Tools: `deepsec.scan`, `deepsec.findings`, `deepsec.explain`, `deepsec.suggest-fix`
+Tools: `deepsec.scan`, `deepsec.findings`, `deepsec.explain`, `deepsec.suggest-fix`, `deepsec.fmt`
 
 ## Deployment
 
@@ -248,6 +309,8 @@ Tools: `deepsec.scan`, `deepsec.findings`, `deepsec.explain`, `deepsec.suggest-f
 deepsec db update --cache-dir /mnt/cache && tar czf deepsec-db.tar.gz ~/.deepsec/cache
 # Server
 deepsec server start --host 0.0.0.0 --port 8443 --tls
+# Formatter only (zero db)
+deepsec fmt . --fix
 ```
 
 ## Documentation
@@ -255,7 +318,14 @@ deepsec server start --host 0.0.0.0 --port 8443 --tls
 - [User Guide](docs/user-guide.md) • [Rule Authoring](docs/rules.md) • [Plugin Dev](docs/plugins.md) • [API](docs/api.md)
 - Full Docs: **https://pixelcity.top/docs/deepsec** • **https://pixelcity.dev/docs/deepsec** • **https://cdn.pixelcity.dev/docs/deepsec**
 
+## About PixelCity
+
+**PixelCity — Your Cloud, Your Rules** — https://pixelcity.top — `service@pixelcity.dev`
+
+DeepSec is developed and operated by **PixelCity** as a public open-source project for the community. Infrastructure served via `Caddy → pixelcity-cdn` (`cdn.pixelcity.dev`, `cdn.pixelcity.top`). Status at https://status.pixelcity.top.
+
 ## Contributing & License
 
 Contributions via PR — see `CONTRIBUTING.md`. Security reports and help: `service@pixelcity.dev`.
-**Apache 2.0** — `LICENSE` — `https://pixelcity.top`
+
+**Apache 2.0** — `LICENSE` — `https://pixelcity.top` — Copyright © PixelCity. Public since **v1.1.0**.

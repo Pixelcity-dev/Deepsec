@@ -19,30 +19,30 @@ func (r *JUnitReporter) Extension() string {
 }
 
 type JUnitOutput struct {
-	XMLName    xml.Name          `xml:"testsuites"`
-	TestSuites []JUnitTestSuite  `xml:"testsuite"`
+	XMLName    xml.Name         `xml:"testsuites"`
+	TestSuites []JUnitTestSuite `xml:"testsuite"`
 }
 
 type JUnitTestSuite struct {
-	Name      string            `xml:"name,attr"`
-	Tests     int               `xml:"tests,attr"`
-	Failures  int               `xml:"failures,attr"`
-	Errors    int               `xml:"errors,attr"`
-	Timestamp string            `xml:"timestamp,attr"`
-	TestCases []JUnitTestCase   `xml:"testcase"`
+	Name      string          `xml:"name,attr"`
+	Tests     int             `xml:"tests,attr"`
+	Failures  int             `xml:"failures,attr"`
+	Errors    int             `xml:"errors,attr"`
+	Timestamp string          `xml:"timestamp,attr"`
+	TestCases []JUnitTestCase `xml:"testcase"`
 }
 
 type JUnitTestCase struct {
-	Name      string            `xml:"name,attr"`
-	Classname string            `xml:"classname,attr"`
-	Time      string            `xml:"time,attr"`
-	Failure   *JUnitFailure     `xml:"failure,omitempty"`
+	Name      string        `xml:"name,attr"`
+	Classname string        `xml:"classname,attr"`
+	Time      string        `xml:"time,attr"`
+	Failure   *JUnitFailure `xml:"failure,omitempty"`
 }
 
 type JUnitFailure struct {
-	Message  string `xml:"message,attr"`
-	Type     string `xml:"type,attr"`
-	Content  string `xml:",chardata"`
+	Message string `xml:"message,attr"`
+	Type    string `xml:"type,attr"`
+	Content string `xml:",chardata"`
 }
 
 func (r *JUnitReporter) Generate(results []core.ScanResult, opts ReportOptions) ([]byte, error) {

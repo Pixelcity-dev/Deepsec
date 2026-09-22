@@ -11,7 +11,7 @@ set -e
 #   sh -c "$(curl -fsSL https://cdn.pixelcity.dev/deepsec/install.sh)"
 #
 # Custom version / dir:
-#   curl -fsSL https://cdn.pixelcity.dev/deepsec/install.sh | DEEPSEC_VERSION=v1.0.0 sh
+#   curl -fsSL https://cdn.pixelcity.dev/deepsec/install.sh | DEEPSEC_VERSION=v1.1.0 sh
 #   curl -fsSL https://cdn.pixelcity.dev/deepsec/install.sh | INSTALL_DIR=/usr/local/bin sh
 #
 # Other methods:
@@ -19,7 +19,7 @@ set -e
 #   docker pull pixelcity/deepsec:latest && docker run --rm pixelcity/deepsec --help
 #   brew install pixelcity/tap/deepsec  (coming soon)
 
-DEEPSEC_VERSION="${DEEPSEC_VERSION:-v1.0.0}"
+DEEPSEC_VERSION="${DEEPSEC_VERSION:-v1.1.0}"
 INSTALL_DIR="${INSTALL_DIR:-$HOME/.local/bin}"
 BASE_URL="${BASE_URL:-https://cdn.pixelcity.dev/deepsec/releases}"
 FALLBACK_URL="https://cdn.pixelcity.top/deepsec/releases"
@@ -45,7 +45,7 @@ for arg in "$@"; do
       echo "Usage: curl -fsSL https://cdn.pixelcity.dev/deepsec/install.sh | sh"
       echo ""
       echo "Env:"
-      echo "  DEEPSEC_VERSION=v1.0.0   version to install (or 'latest')"
+      echo "  DEEPSEC_VERSION=v1.1.0   version to install (or 'latest')"
       echo "  INSTALL_DIR=\$HOME/.local/bin   install directory"
       echo "  BASE_URL=https://cdn.pixelcity.dev/deepsec/releases override"
       echo "Args:"
@@ -95,7 +95,7 @@ check_deps() {
 resolve_latest() {
   if [ "$DEEPSEC_VERSION" = "latest" ] || [ "$DEEPSEC_VERSION" = "stable" ]; then
     info "Resolving latest version..."
-    # try CDN VERSION file, then fallback to v1.0.0
+    # try CDN VERSION file, then fallback to v1.1.0
     LATEST_URL="$BASE_URL/../VERSION"
     # Try to fetch latest version string; ignore errors
     RESOLVED=""
@@ -108,7 +108,7 @@ resolve_latest() {
       DEEPSEC_VERSION="$RESOLVED"
       info "Latest is $DEEPSEC_VERSION"
     else
-      DEEPSEC_VERSION="v1.0.0"
+      DEEPSEC_VERSION="v1.1.0"
       warn "Could not resolve latest, using $DEEPSEC_VERSION"
     fi
   fi

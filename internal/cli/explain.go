@@ -3,8 +3,8 @@ package cli
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
 	"github.com/Pixelcity-dev/Deepsec/internal/core"
+	"github.com/spf13/cobra"
 )
 
 var (

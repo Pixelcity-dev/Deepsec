@@ -19,11 +19,11 @@ func (r *CycloneDXReporter) Extension() string {
 }
 
 type CycloneDXOutput struct {
-	BomFormat    string              `json:"bomFormat"`
-	SpecVersion  string              `json:"specVersion"`
-	Version      int                 `json:"version"`
-	Metadata     CycloneDXMetadata   `json:"metadata"`
-	Components   []CycloneDXComponent `json:"components,omitempty"`
+	BomFormat    string                `json:"bomFormat"`
+	SpecVersion  string                `json:"specVersion"`
+	Version      int                   `json:"version"`
+	Metadata     CycloneDXMetadata     `json:"metadata"`
+	Components   []CycloneDXComponent  `json:"components,omitempty"`
 	Dependencies []CycloneDXDependency `json:"dependencies,omitempty"`
 }
 
@@ -39,11 +39,11 @@ type CycloneDXTool struct {
 }
 
 type CycloneDXComponent struct {
-	Type    string             `json:"type"`
-	BomRef  string             `json:"bom-ref"`
-	Name    string             `json:"name"`
-	Version string             `json:"version,omitempty"`
-	Package CycloneDXPackage  `json:"package,omitempty"`
+	Type    string           `json:"type"`
+	BomRef  string           `json:"bom-ref"`
+	Name    string           `json:"name"`
+	Version string           `json:"version,omitempty"`
+	Package CycloneDXPackage `json:"package,omitempty"`
 }
 
 type CycloneDXPackage struct {
@@ -51,8 +51,8 @@ type CycloneDXPackage struct {
 }
 
 type CycloneDXDependency struct {
-	Ref          string   `json:"ref"`
-	DependsOn    []string `json:"dependsOn,omitempty"`
+	Ref       string   `json:"ref"`
+	DependsOn []string `json:"dependsOn,omitempty"`
 }
 
 func (r *CycloneDXReporter) Generate(results []core.ScanResult, opts ReportOptions) ([]byte, error) {
@@ -66,7 +66,7 @@ func (r *CycloneDXReporter) Generate(results []core.ScanResult, opts ReportOptio
 				{
 					Vendor:  "DeepSec",
 					Name:    "deepsec",
-					Version: "1.0.0",
+					Version: "1.1.0",
 				},
 			},
 		},

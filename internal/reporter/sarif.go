@@ -19,13 +19,13 @@ func (r *SARIFReporter) Extension() string {
 }
 
 type SARIFOutput struct {
-	Schema  string      `json:"$schema"`
-	Version string      `json:"version"`
+	Schema  string     `json:"$schema"`
+	Version string     `json:"version"`
 	Runs    []SARIFRun `json:"runs"`
 }
 
 type SARIFRun struct {
-	Tool    SARIFTool    `json:"tool"`
+	Tool    SARIFTool     `json:"tool"`
 	Results []SARIFResult `json:"results"`
 }
 
@@ -34,18 +34,18 @@ type SARIFTool struct {
 }
 
 type SARIFDriver struct {
-	Name           string            `json:"name"`
-	Version        string            `json:"version"`
-	InformationURI string            `json:"informationUri"`
-	Rules          []SARIFRule       `json:"rules,omitempty"`
+	Name           string      `json:"name"`
+	Version        string      `json:"version"`
+	InformationURI string      `json:"informationUri"`
+	Rules          []SARIFRule `json:"rules,omitempty"`
 }
 
 type SARIFRule struct {
-	ID               string          `json:"id"`
-	Name             string          `json:"name"`
-	ShortDescription SARIFText       `json:"shortDescription"`
-	FullDescription  SARIFText       `json:"fullDescription,omitempty"`
-	HelpURI          string          `json:"helpUri,omitempty"`
+	ID                   string      `json:"id"`
+	Name                 string      `json:"name"`
+	ShortDescription     SARIFText   `json:"shortDescription"`
+	FullDescription      SARIFText   `json:"fullDescription,omitempty"`
+	HelpURI              string      `json:"helpUri,omitempty"`
 	DefaultConfiguration SARIFConfig `json:"defaultConfiguration,omitempty"`
 }
 
@@ -58,10 +58,10 @@ type SARIFConfig struct {
 }
 
 type SARIFResult struct {
-	RuleID  string       `json:"ruleId"`
-	Level   string       `json:"level"`
-	Message SARIFMessage `json:"message"`
-	Locations []SARIFLocation `json:"locations,omitempty"`
+	RuleID     string                 `json:"ruleId"`
+	Level      string                 `json:"level"`
+	Message    SARIFMessage           `json:"message"`
+	Locations  []SARIFLocation        `json:"locations,omitempty"`
 	Properties map[string]interface{} `json:"properties,omitempty"`
 }
 
@@ -100,7 +100,7 @@ func (r *SARIFReporter) Generate(results []core.ScanResult, opts ReportOptions) 
 			Tool: SARIFTool{
 				Driver: SARIFDriver{
 					Name:           "deepsec",
-					Version:        "1.0.0",
+					Version:        "1.1.0",
 					InformationURI: "https://deepsec.dev",
 				},
 			},
@@ -129,9 +129,9 @@ func (r *SARIFReporter) Generate(results []core.ScanResult, opts ReportOptions) 
 					Text: f.Description,
 				},
 				Properties: map[string]interface{}{
-					"severity":   f.Severity.String(),
-					"category":   f.Category,
-					"confidence": f.Confidence,
+					"severity":    f.Severity.String(),
+					"category":    f.Category,
+					"confidence":  f.Confidence,
 					"fingerprint": f.Fingerprint,
 				},
 			}

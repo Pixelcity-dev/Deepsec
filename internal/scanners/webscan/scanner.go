@@ -29,7 +29,7 @@ func NewWebScanScanner() *WebScanScanner {
 	}
 }
 
-func (s *WebScanScanner) Name() string { return s.name }
+func (s *WebScanScanner) Name() string        { return s.name }
 func (s *WebScanScanner) Type() core.ScanType { return core.ScanTypeWebScan }
 func (s *WebScanScanner) SupportedTargets() []core.TargetKind {
 	return []core.TargetKind{core.TargetURL, core.TargetFS}
@@ -185,13 +185,13 @@ func checkSecurityHeadersDeep(target *url.URL, client *http.Client, resp *http.R
 		fix      string
 		refs     []string
 	}{
-		"Strict-Transport-Security": {core.SeverityHigh, "Add Strict-Transport-Security: max-age=63072000; includeSubDomains; preload", []string{"https://owasp.org/www-project-secure-headers/", "https://hstspreload.org/"}},
-		"Content-Security-Policy":   {core.SeverityHigh, "Add CSP: default-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'", []string{"https://csp-evaluator.withgoogle.com/", "https://owasp.org/www-project-secure-headers/"}},
-		"X-Content-Type-Options":    {core.SeverityMedium, "Add X-Content-Type-Options: nosniff", []string{"https://owasp.org/www-project-secure-headers/"}},
-		"X-Frame-Options":           {core.SeverityMedium, "Add X-Frame-Options: DENY or use CSP frame-ancestors", []string{}},
-		"Referrer-Policy":           {core.SeverityMedium, "Add Referrer-Policy: strict-origin-when-cross-origin or no-referrer", []string{}},
-		"Permissions-Policy":        {core.SeverityLow, "Add Permissions-Policy: camera=(), microphone=(), geolocation=()", []string{}},
-		"Cross-Origin-Opener-Policy": {core.SeverityLow, "Add Cross-Origin-Opener-Policy: same-origin", []string{}},
+		"Strict-Transport-Security":    {core.SeverityHigh, "Add Strict-Transport-Security: max-age=63072000; includeSubDomains; preload", []string{"https://owasp.org/www-project-secure-headers/", "https://hstspreload.org/"}},
+		"Content-Security-Policy":      {core.SeverityHigh, "Add CSP: default-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'", []string{"https://csp-evaluator.withgoogle.com/", "https://owasp.org/www-project-secure-headers/"}},
+		"X-Content-Type-Options":       {core.SeverityMedium, "Add X-Content-Type-Options: nosniff", []string{"https://owasp.org/www-project-secure-headers/"}},
+		"X-Frame-Options":              {core.SeverityMedium, "Add X-Frame-Options: DENY or use CSP frame-ancestors", []string{}},
+		"Referrer-Policy":              {core.SeverityMedium, "Add Referrer-Policy: strict-origin-when-cross-origin or no-referrer", []string{}},
+		"Permissions-Policy":           {core.SeverityLow, "Add Permissions-Policy: camera=(), microphone=(), geolocation=()", []string{}},
+		"Cross-Origin-Opener-Policy":   {core.SeverityLow, "Add Cross-Origin-Opener-Policy: same-origin", []string{}},
 		"Cross-Origin-Embedder-Policy": {core.SeverityLow, "Add Cross-Origin-Embedder-Policy: require-corp", []string{}},
 		"Cross-Origin-Resource-Policy": {core.SeverityLow, "Add Cross-Origin-Resource-Policy: same-origin", []string{}},
 	}
@@ -392,13 +392,13 @@ func checkTLSDeep(target *url.URL) []core.Finding {
 	}
 	// Cipher suite check (weak ciphers)
 	weakCiphers := map[uint16]bool{
-		tls.TLS_RSA_WITH_RC4_128_SHA:                true,
-		tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA:           true,
-		tls.TLS_RSA_WITH_AES_128_CBC_SHA:            true,
-		tls.TLS_RSA_WITH_AES_256_CBC_SHA:            true,
-		tls.TLS_ECDHE_RSA_WITH_RC4_128_SHA:          true,
-		tls.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA:     true,
-		tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA:      true,
+		tls.TLS_RSA_WITH_RC4_128_SHA:            true,
+		tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA:       true,
+		tls.TLS_RSA_WITH_AES_128_CBC_SHA:        true,
+		tls.TLS_RSA_WITH_AES_256_CBC_SHA:        true,
+		tls.TLS_ECDHE_RSA_WITH_RC4_128_SHA:      true,
+		tls.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA: true,
+		tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA:  true,
 	}
 	if weakCiphers[state.CipherSuite] {
 		findings = append(findings, core.Finding{
@@ -623,14 +623,14 @@ func checkInformationDisclosure(resp *http.Response) []core.Finding {
 		return findings
 	}
 	headers := map[string]string{
-		"Server":               resp.Header.Get("Server"),
-		"X-Powered-By":         resp.Header.Get("X-Powered-By"),
-		"X-AspNet-Version":     resp.Header.Get("X-AspNet-Version"),
-		"X-Generator":          resp.Header.Get("X-Generator"),
-		"X-Drupal-Cache":       resp.Header.Get("X-Drupal-Cache"),
-		"X-Pingback":           resp.Header.Get("X-Pingback"),
-		"Via":                  resp.Header.Get("Via"),
-		"X-Backend-Server":     resp.Header.Get("X-Backend-Server"),
+		"Server":           resp.Header.Get("Server"),
+		"X-Powered-By":     resp.Header.Get("X-Powered-By"),
+		"X-AspNet-Version": resp.Header.Get("X-AspNet-Version"),
+		"X-Generator":      resp.Header.Get("X-Generator"),
+		"X-Drupal-Cache":   resp.Header.Get("X-Drupal-Cache"),
+		"X-Pingback":       resp.Header.Get("X-Pingback"),
+		"Via":              resp.Header.Get("Via"),
+		"X-Backend-Server": resp.Header.Get("X-Backend-Server"),
 	}
 	for h, v := range headers {
 		if v != "" {
@@ -737,7 +737,7 @@ func checkExposedFiles(target *url.URL, client *http.Client) []core.Finding {
 		isSecurityTxt := p.path == "/.well-known/security.txt"
 		urlStr := base + p.path
 		resp, body := fetchURL(urlStr, &http.Client{
-			Timeout: 5 * time.Second,
+			Timeout:   5 * time.Second,
 			Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}},
 		})
 		if resp == nil {
@@ -840,7 +840,7 @@ func checkOpenRedirect(target *url.URL, client *http.Client) []core.Finding {
 	var findings []core.Finding
 	// Do not follow redirects
 	noRedir := &http.Client{
-		Timeout: 5 * time.Second,
+		Timeout:   5 * time.Second,
 		Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}},
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse

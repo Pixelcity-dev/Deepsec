@@ -19,6 +19,7 @@ const (
 	ScanTypeNetwork   ScanType = "network"
 	ScanTypeLicense   ScanType = "license"
 	ScanTypeWebScan   ScanType = "webscan"
+	ScanTypeFormat    ScanType = "format"
 )
 
 type TargetKind string
@@ -34,8 +35,8 @@ const (
 )
 
 type Target struct {
-	Kind    TargetKind            `json:"kind"`
-	URI     string                `json:"uri"`
+	Kind    TargetKind             `json:"kind"`
+	URI     string                 `json:"uri"`
 	Options map[string]interface{} `json:"options,omitempty"`
 }
 
@@ -100,12 +101,12 @@ func (r *ScanResult) FilterBySeverity(minSeverity Severity) []Finding {
 }
 
 type ScanSummary struct {
-	TotalFindings  int            `json:"total_findings"`
-	BySeverity     map[string]int `json:"by_severity"`
-	ByType         map[string]int `json:"by_type"`
-	ByCategory     map[string]int `json:"by_category"`
-	FilesScanned   int            `json:"files_scanned"`
-	Duration       float64        `json:"duration_seconds"`
+	TotalFindings int            `json:"total_findings"`
+	BySeverity    map[string]int `json:"by_severity"`
+	ByType        map[string]int `json:"by_type"`
+	ByCategory    map[string]int `json:"by_category"`
+	FilesScanned  int            `json:"files_scanned"`
+	Duration      float64        `json:"duration_seconds"`
 }
 
 func NewScanSummary(results []ScanResult) ScanSummary {

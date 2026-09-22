@@ -6,9 +6,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/spf13/cobra"
 	"github.com/Pixelcity-dev/Deepsec/internal/core"
 	"github.com/Pixelcity-dev/Deepsec/internal/reporter"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -69,7 +69,7 @@ func runWebscan(cmd *cobra.Command, args []string) error {
 		targetURL = "https://" + targetURL
 	}
 
-	fmt.Fprintf(os.Stderr, "DeepSec WebScan v1.0.0 - Deep website audit on %s\n", targetURL)
+	fmt.Fprintf(os.Stderr, "DeepSec WebScan v%s - Deep website audit on %s\n", version, targetURL)
 	if webscanDeep {
 		fmt.Fprintf(os.Stderr, "Mode: very deep (headers + TLS + CORS + exposed files + open redirect + XSS + SQLi + ...)\n")
 	}

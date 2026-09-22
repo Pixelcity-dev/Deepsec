@@ -27,7 +27,7 @@ func NewDASTScanner() *DASTScanner {
 	}
 }
 
-func (s *DASTScanner) Name() string { return s.name }
+func (s *DASTScanner) Name() string        { return s.name }
 func (s *DASTScanner) Type() core.ScanType { return core.ScanTypeDAST }
 func (s *DASTScanner) SupportedTargets() []core.TargetKind {
 	return []core.TargetKind{core.TargetURL}
@@ -76,13 +76,13 @@ func checkSecurityHeaders(targetURL *url.URL, resp *http.Response) []core.Findin
 		Severity core.Severity
 		Fix      string
 	}{
-		"X-Content-Type-Options":      {Name: "X-Content-Type-Options", Severity: core.SeverityMedium, Fix: "Add header: X-Content-Type-Options: nosniff"},
-		"X-Frame-Options":             {Name: "X-Frame-Options", Severity: core.SeverityMedium, Fix: "Add header: X-Frame-Options: DENY or SAMEORIGIN"},
-		"Strict-Transport-Security":   {Name: "Strict-Transport-Security", Severity: core.SeverityHigh, Fix: "Add header: Strict-Transport-Security: max-age=31536000; includeSubDomains"},
-		"Content-Security-Policy":     {Name: "Content-Security-Policy", Severity: core.SeverityHigh, Fix: "Add Content-Security-Policy header with appropriate directives"},
-		"Referrer-Policy":             {Name: "Referrer-Policy", Severity: core.SeverityMedium, Fix: "Add header: Referrer-Policy: strict-origin-when-cross-origin"},
-		"Permissions-Policy":          {Name: "Permissions-Policy", Severity: core.SeverityMedium, Fix: "Add Permissions-Policy header to restrict browser features"},
-		"Cross-Origin-Opener-Policy":  {Name: "Cross-Origin-Opener-Policy", Severity: core.SeverityLow, Fix: "Add Cross-Origin-Opener-Policy: same-origin"},
+		"X-Content-Type-Options":       {Name: "X-Content-Type-Options", Severity: core.SeverityMedium, Fix: "Add header: X-Content-Type-Options: nosniff"},
+		"X-Frame-Options":              {Name: "X-Frame-Options", Severity: core.SeverityMedium, Fix: "Add header: X-Frame-Options: DENY or SAMEORIGIN"},
+		"Strict-Transport-Security":    {Name: "Strict-Transport-Security", Severity: core.SeverityHigh, Fix: "Add header: Strict-Transport-Security: max-age=31536000; includeSubDomains"},
+		"Content-Security-Policy":      {Name: "Content-Security-Policy", Severity: core.SeverityHigh, Fix: "Add Content-Security-Policy header with appropriate directives"},
+		"Referrer-Policy":              {Name: "Referrer-Policy", Severity: core.SeverityMedium, Fix: "Add header: Referrer-Policy: strict-origin-when-cross-origin"},
+		"Permissions-Policy":           {Name: "Permissions-Policy", Severity: core.SeverityMedium, Fix: "Add Permissions-Policy header to restrict browser features"},
+		"Cross-Origin-Opener-Policy":   {Name: "Cross-Origin-Opener-Policy", Severity: core.SeverityLow, Fix: "Add Cross-Origin-Opener-Policy: same-origin"},
 		"Cross-Origin-Resource-Policy": {Name: "Cross-Origin-Resource-Policy", Severity: core.SeverityLow, Fix: "Add Cross-Origin-Resource-Policy: same-origin"},
 	}
 
@@ -210,9 +210,9 @@ func checkTLSDeep(targetURL *url.URL) []core.Finding {
 			}
 			findings = append(findings, core.Finding{
 				RuleID: "dast-tls-cert-expiry", Severity: sev, Category: "transport-security",
-				Title: fmt.Sprintf("TLS cert expires in %s", time.Until(cert.NotAfter).Truncate(time.Hour).String()),
+				Title:       fmt.Sprintf("TLS cert expires in %s", time.Until(cert.NotAfter).Truncate(time.Hour).String()),
 				Description: fmt.Sprintf("NotAfter: %s Subject: %s", cert.NotAfter.Format(time.RFC3339), cert.Subject.CommonName),
-				Fix: "Renew certificate", Confidence: 1.0,
+				Fix:         "Renew certificate", Confidence: 1.0,
 			})
 		}
 		if err := cert.VerifyHostname(targetURL.Hostname()); err != nil {
@@ -350,7 +350,7 @@ func checkHTTPSRedirect(target *url.URL) []core.Finding {
 	}
 	httpURL := "http://" + target.Host + target.Path
 	noRedir := &http.Client{
-		Timeout: 5 * time.Second,
+		Timeout:       5 * time.Second,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
 	}
 	resp, err := noRedir.Get(httpURL)

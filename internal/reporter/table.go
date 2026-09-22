@@ -11,7 +11,7 @@ import (
 
 type TableReporter struct{}
 
-func (r *TableReporter) Name() string { return "table" }
+func (r *TableReporter) Name() string      { return "table" }
 func (r *TableReporter) Extension() string { return "" }
 
 func (r *TableReporter) Generate(results []core.ScanResult, opts ReportOptions) ([]byte, error) {
@@ -35,11 +35,11 @@ func (r *TableReporter) Generate(results []core.ScanResult, opts ReportOptions) 
 	if opts.Color {
 		sb.WriteString("\033[1;34m╔════════════════════════════════════════════════════════════════╗\033[0m\n")
 		sb.WriteString("\033[1;34m║\033[0m \033[1;37mDeepSec — Cyber Security Enterprise Tool                    \033[0m\033[1;34m║\033[0m\n")
-		sb.WriteString("\033[1;34m║\033[0m  \033[2mSAST • SCA • Secrets • IaC • Containers • DAST • WebScan • Network\033[0m  \033[1;34m║\033[0m\n")
+		sb.WriteString("\033[1;34m║\033[0m  \033[2mSAST • SCA • Secrets • IaC • Containers • DAST • WebScan • Network • Format\033[0m  \033[1;34m║\033[0m\n")
 		sb.WriteString("\033[1;34m╚════════════════════════════════════════════════════════════════╝\033[0m\n")
 	} else {
 		sb.WriteString("DeepSec — Cyber Security Enterprise Tool\n")
-		sb.WriteString("SAST • SCA • Secrets • IaC • Containers • DAST • WebScan • Network\n")
+		sb.WriteString("SAST • SCA • Secrets • IaC • Containers • DAST • WebScan • Network • Format\n")
 	}
 	sb.WriteString(fmt.Sprintf("  Target: %s  •  %s  •  %.2fs\n", strings.Join(targets, ", "), time.Now().Format("2006-01-02 15:04 MST"), duration))
 	// Risk rating

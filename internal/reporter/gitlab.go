@@ -19,35 +19,35 @@ func (r *GitLabReporter) Extension() string {
 }
 
 type GitLabReport struct {
-	Schema    string                `json:"schema"`
-	Version   string                `json:"version"`
-	ScanType  string                `json:"scan_type"`
-	ScanInfo  GitLabScanInfo        `json:"scan_info"`
-	Vulnerabilities []GitLabVuln    `json:"vulnerabilities,omitempty"`
+	Schema          string         `json:"schema"`
+	Version         string         `json:"version"`
+	ScanType        string         `json:"scan_type"`
+	ScanInfo        GitLabScanInfo `json:"scan_info"`
+	Vulnerabilities []GitLabVuln   `json:"vulnerabilities,omitempty"`
 }
 
 type GitLabScanInfo struct {
-	ScanType   string `json:"scan_type"`
-	Scanner    GitLabScanner `json:"scanner"`
-	Timestamp  string `json:"timestamp"`
+	ScanType  string        `json:"scan_type"`
+	Scanner   GitLabScanner `json:"scanner"`
+	Timestamp string        `json:"timestamp"`
 }
 
 type GitLabScanner struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Version  string `json:"version"`
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Version string `json:"version"`
 }
 
 type GitLabVuln struct {
-	ID          string                 `json:"id"`
-	Category    string                 `json:"category"`
-	Name        string                 `json:"name"`
-	Message     string                 `json:"message"`
-	Description string                 `json:"description"`
-	Severity    string                 `json:"severity"`
-	Solution    string                 `json:"solution,omitempty"`
-	Identifiers []GitLabIdentifier    `json:"identifiers"`
-	Location    GitLabLocation         `json:"location"`
+	ID          string             `json:"id"`
+	Category    string             `json:"category"`
+	Name        string             `json:"name"`
+	Message     string             `json:"message"`
+	Description string             `json:"description"`
+	Severity    string             `json:"severity"`
+	Solution    string             `json:"solution,omitempty"`
+	Identifiers []GitLabIdentifier `json:"identifiers"`
+	Location    GitLabLocation     `json:"location"`
 }
 
 type GitLabIdentifier struct {
@@ -70,7 +70,7 @@ func (r *GitLabReporter) Generate(results []core.ScanResult, opts ReportOptions)
 			Scanner: GitLabScanner{
 				ID:      "deepsec",
 				Name:    "DeepSec",
-				Version: "1.0.0",
+				Version: "1.1.0",
 			},
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		},

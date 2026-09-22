@@ -42,7 +42,7 @@ func init() {
 func runGeneratePreCommit(cmd *cobra.Command, args []string) error {
 	content := `repos:
   - repo: https://github.com/deepsec/deepsec
-    rev: v1.0.0
+    rev: v1.1.0
     hooks:
       - id: deepsec-secrets
         name: DeepSec Secrets Scan

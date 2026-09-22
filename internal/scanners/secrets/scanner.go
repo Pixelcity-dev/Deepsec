@@ -12,7 +12,7 @@ import (
 
 type SecretsScanner struct {
 	core.BaseScanner
-	name    string
+	name     string
 	patterns []SecretPattern
 }
 
@@ -110,16 +110,16 @@ func (s *SecretsScanner) scanFile(path string, lines []string) []core.Finding {
 		for _, pattern := range s.patterns {
 			if pattern.Pattern.MatchString(line) {
 				finding := core.Finding{
-					RuleID:     "secrets-" + strings.ToLower(strings.ReplaceAll(pattern.Name, " ", "-")),
-					Severity:   pattern.Severity,
-					Category:   pattern.Category,
-					Title:      pattern.Name,
+					RuleID:      "secrets-" + strings.ToLower(strings.ReplaceAll(pattern.Name, " ", "-")),
+					Severity:    pattern.Severity,
+					Category:    pattern.Category,
+					Title:       pattern.Name,
 					Description: "Potential " + pattern.Name + " detected",
-					File:       path,
-					Line:       i + 1,
-					Code:       redactSecret(strings.TrimSpace(line)),
-					Fix:        "Remove the secret from code and use environment variables or a secrets manager",
-					Confidence: 0.9,
+					File:        path,
+					Line:        i + 1,
+					Code:        redactSecret(strings.TrimSpace(line)),
+					Fix:         "Remove the secret from code and use environment variables or a secrets manager",
+					Confidence:  0.9,
 				}
 				finding.GenerateFingerprint()
 				findings = append(findings, finding)

@@ -11,7 +11,7 @@ import (
 
 type HTMLReporter struct{}
 
-func (r *HTMLReporter) Name() string { return "html" }
+func (r *HTMLReporter) Name() string      { return "html" }
 func (r *HTMLReporter) Extension() string { return "html" }
 
 func (r *HTMLReporter) Generate(results []core.ScanResult, opts ReportOptions) ([]byte, error) {
@@ -203,7 +203,7 @@ body{font-family:Inter,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
 	}
 
 	sb.WriteString(`<div class="footer">
-<p><strong>DeepSec</strong> v1.0.0 — Cyber Security Enterprise Tool • Generated ` + time.Now().Format(time.RFC3339) + ` • Target: ` + templateEscape(targetStr) + `</p>
+<p><strong>DeepSec</strong> v1.1.0 — Cyber Security Enterprise Tool • Generated ` + time.Now().Format(time.RFC3339) + ` • Target: ` + templateEscape(targetStr) + `</p>
 <p><a href="https://pixelcity.top/docs/deepsec" style="color:#58a6ff">Docs</a> • <a href="https://github.com/Pixelcity-dev/Deepsec" style="color:#58a6ff">GitHub</a></p>
 </div></div></body></html>`)
 	return []byte(sb.String()), nil

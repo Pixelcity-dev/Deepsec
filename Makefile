@@ -1,7 +1,7 @@
 .PHONY: build test lint clean install
 
 APP_NAME := deepsec
-VERSION := 1.0.0
+VERSION := 1.1.0
 BUILD_TIME := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo dev)
 LDFLAGS := -ldflags "-X github.com/Pixelcity-dev/Deepsec/internal/cli.version=$(VERSION) -X github.com/Pixelcity-dev/Deepsec/internal/cli.buildTime=$(BUILD_TIME) -X github.com/Pixelcity-dev/Deepsec/internal/cli.commit=$(COMMIT)"

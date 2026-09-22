@@ -19,22 +19,22 @@ func (r *GitHubReporter) Extension() string {
 }
 
 type GitHubSnapshot struct {
-	Schema  string                `json:"$schema"`
-	Version int                   `json:"version"`
-	Ref     string                `json:"ref"`
-	Scanned string                `json:"scanned"`
-	Manifests []GitHubManifest   `json:"manifests,omitempty"`
+	Schema    string           `json:"$schema"`
+	Version   int              `json:"version"`
+	Ref       string           `json:"ref"`
+	Scanned   string           `json:"scanned"`
+	Manifests []GitHubManifest `json:"manifests,omitempty"`
 }
 
 type GitHubManifest struct {
-	Name    string              `json:"name"`
-	File    string              `json:"file"`
-	Package GitHubPackage       `json:"package"`
+	Name    string        `json:"name"`
+	File    string        `json:"file"`
+	Package GitHubPackage `json:"package"`
 }
 
 type GitHubPackage struct {
-	Name    string              `json:"name"`
-	Version string              `json:"version"`
+	Name    string `json:"name"`
+	Version string `json:"version"`
 }
 
 func (r *GitHubReporter) Generate(results []core.ScanResult, opts ReportOptions) ([]byte, error) {

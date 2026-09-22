@@ -5,9 +5,9 @@ import (
 )
 
 type ReportOptions struct {
-	Format string
-	Output string
-	Color  bool
+	Format   string
+	Output   string
+	Color    bool
 	Template string
 }
 

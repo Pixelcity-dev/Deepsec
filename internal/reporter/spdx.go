@@ -19,25 +19,25 @@ func (r *SPDXReporter) Extension() string {
 }
 
 type SPDXOutput struct {
-	SPDXVersion       string                `json:"spdxVersion"`
-	DataLicense       string                `json:"dataLicense"`
-	SPDXID            string                `json:"SPDXID"`
-	DocumentName      string                `json:"documentName"`
-	DocumentNamespace string                `json:"documentNamespace"`
-	Created           string                `json:"created"`
-	Creator           string                `json:"creator"`
-	Packages          []SPDXPackage         `json:"packages,omitempty"`
-	Relationships     []SPDXRelationship    `json:"relationships,omitempty"`
+	SPDXVersion       string             `json:"spdxVersion"`
+	DataLicense       string             `json:"dataLicense"`
+	SPDXID            string             `json:"SPDXID"`
+	DocumentName      string             `json:"documentName"`
+	DocumentNamespace string             `json:"documentNamespace"`
+	Created           string             `json:"created"`
+	Creator           string             `json:"creator"`
+	Packages          []SPDXPackage      `json:"packages,omitempty"`
+	Relationships     []SPDXRelationship `json:"relationships,omitempty"`
 }
 
 type SPDXPackage struct {
-	SPDXID               string              `json:"SPDXID"`
-	Name                 string              `json:"name"`
-	VersionInfo          string              `json:"versionInfo,omitempty"`
-	PackageFileName      string              `json:"packageFileName,omitempty"`
-	DownloadLocation     string              `json:"downloadLocation"`
-	filesAnalyzed        bool                `json:"filesAnalyzed"`
-	PackageChecksums     []SPDXChecksum      `json:"packageChecksums,omitempty"`
+	SPDXID                    string            `json:"SPDXID"`
+	Name                      string            `json:"name"`
+	VersionInfo               string            `json:"versionInfo,omitempty"`
+	PackageFileName           string            `json:"packageFileName,omitempty"`
+	DownloadLocation          string            `json:"downloadLocation"`
+	filesAnalyzed             bool              `json:"filesAnalyzed"`
+	PackageChecksums          []SPDXChecksum    `json:"packageChecksums,omitempty"`
 	PackageExternalReferences []SPDXExternalRef `json:"packageExternalReferences,omitempty"`
 }
 
@@ -53,8 +53,8 @@ type SPDXExternalRef struct {
 }
 
 type SPDXRelationship struct {
-	SpdxElementID string `json:"spdxElementId"`
-	RelationshipType string `json:"relationshipType"`
+	SpdxElementID      string `json:"spdxElementId"`
+	RelationshipType   string `json:"relationshipType"`
 	RelatedSpdxElement string `json:"relatedSpdxElement"`
 }
 
@@ -66,7 +66,7 @@ func (r *SPDXReporter) Generate(results []core.ScanResult, opts ReportOptions) (
 		DocumentName:      "DeepSec Scan Results",
 		DocumentNamespace: "https://deepsec.dev/scan/" + time.Now().Format("20060102"),
 		Created:           time.Now().UTC().Format(time.RFC3339),
-		Creator:           "Tool: deepsec-1.0.0",
+		Creator:           "Tool: deepsec-1.1.0",
 	}
 
 	return json.MarshalIndent(output, "", "  ")

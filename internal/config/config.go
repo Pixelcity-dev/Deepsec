@@ -8,14 +8,14 @@ import (
 )
 
 type Config struct {
-	Version  string            `yaml:"version" json:"version"`
-	Scanners ScannerConfig     `yaml:"scanners" json:"scanners"`
-	Report   ReportConfig      `yaml:"report" json:"report"`
-	Rules    RulesConfig       `yaml:"rules" json:"rules"`
-	DB       DBConfig          `yaml:"db" json:"db"`
-	Plugin   PluginConfig      `yaml:"plugin" json:"plugin"`
-	Server   ServerConfig      `yaml:"server" json:"server"`
-	Filter   FilterConfig      `yaml:"filter" json:"filter"`
+	Version  string        `yaml:"version" json:"version"`
+	Scanners ScannerConfig `yaml:"scanners" json:"scanners"`
+	Report   ReportConfig  `yaml:"report" json:"report"`
+	Rules    RulesConfig   `yaml:"rules" json:"rules"`
+	DB       DBConfig      `yaml:"db" json:"db"`
+	Plugin   PluginConfig  `yaml:"plugin" json:"plugin"`
+	Server   ServerConfig  `yaml:"server" json:"server"`
+	Filter   FilterConfig  `yaml:"filter" json:"filter"`
 }
 
 type ScannerConfig struct {
@@ -28,32 +28,33 @@ type ScannerConfig struct {
 	Network   bool `yaml:"network" json:"network"`
 	License   bool `yaml:"license" json:"license"`
 	WebScan   bool `yaml:"webscan" json:"webscan"`
+	Format    bool `yaml:"format" json:"format"`
 }
 
 type ReportConfig struct {
-	Format    string `yaml:"format" json:"format"`
-	Output    string `yaml:"output" json:"output"`
-	Template  string `yaml:"template,omitempty" json:"template,omitempty"`
-	Color     bool   `yaml:"color" json:"color"`
-	Verbose   bool   `yaml:"verbose" json:"verbose"`
+	Format   string `yaml:"format" json:"format"`
+	Output   string `yaml:"output" json:"output"`
+	Template string `yaml:"template,omitempty" json:"template,omitempty"`
+	Color    bool   `yaml:"color" json:"color"`
+	Verbose  bool   `yaml:"verbose" json:"verbose"`
 }
 
 type RulesConfig struct {
- Paths    []string `yaml:"paths" json:"paths"`
- BuiltIn  bool     `yaml:"builtin" json:"builtin"`
- Custom   []string `yaml:"custom,omitempty" json:"custom,omitempty"`
+	Paths   []string `yaml:"paths" json:"paths"`
+	BuiltIn bool     `yaml:"builtin" json:"builtin"`
+	Custom  []string `yaml:"custom,omitempty" json:"custom,omitempty"`
 }
 
 type DBConfig struct {
-	CacheDir  string `yaml:"cache_dir" json:"cache_dir"`
-	UpdateURL string `yaml:"update_url" json:"update_url"`
-	AutoUpdate bool `yaml:"auto_update" json:"auto_update"`
+	CacheDir   string `yaml:"cache_dir" json:"cache_dir"`
+	UpdateURL  string `yaml:"update_url" json:"update_url"`
+	AutoUpdate bool   `yaml:"auto_update" json:"auto_update"`
 }
 
 type PluginConfig struct {
-	Dir      string            `yaml:"dir" json:"dir"`
-	Registry string            `yaml:"registry" json:"registry"`
-	Enabled  map[string]bool   `yaml:"enabled,omitempty" json:"enabled,omitempty"`
+	Dir      string          `yaml:"dir" json:"dir"`
+	Registry string          `yaml:"registry" json:"registry"`
+	Enabled  map[string]bool `yaml:"enabled,omitempty" json:"enabled,omitempty"`
 }
 
 type ServerConfig struct {
@@ -93,6 +94,8 @@ var ComplianceByCategory = map[string]ComplianceMapping{
 	"secrets":                {OWASP: "A07:2021", CWE: "798", SOC2: "CC6.1", ISO27001: "A.9.4.3"},
 	"sast":                   {OWASP: "A03:2021", CWE: "20", SOC2: "CC7.2", ISO27001: "A.14.2.1"},
 	"sca":                    {OWASP: "A06:2021", CWE: "1104", SOC2: "CC7.2", ISO27001: "A.14.2.7"},
+	"style":                  {OWASP: "A04:2021", CWE: "710", SOC2: "CC7.2", ISO27001: "A.14.2.1"},
+	"formatting":             {OWASP: "A04:2021", CWE: "710", SOC2: "CC7.2", ISO27001: "A.14.2.1"},
 }
 
 func ProfileConfig(profile string) *Config {
@@ -130,7 +133,7 @@ func DefaultConfig() *Config {
 	pluginDir := filepath.Join(homeDir, ".deepsec", "plugins")
 
 	return &Config{
-		Version: "1.0.0",
+		Version: "1.1.0",
 		Scanners: ScannerConfig{
 			SAST:      true,
 			SCA:       true,
@@ -141,6 +144,7 @@ func DefaultConfig() *Config {
 			Network:   true,
 			License:   true,
 			WebScan:   true,
+			Format:    true,
 		},
 		Report: ReportConfig{
 			Format: "table",
@@ -253,5 +257,8 @@ func (c *Config) MergeWith(other *Config) {
 	}
 	if other.Scanners.WebScan {
 		c.Scanners.WebScan = true
+	}
+	if other.Scanners.Format {
+		c.Scanners.Format = true
 	}
 }

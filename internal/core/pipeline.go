@@ -8,10 +8,10 @@ import (
 )
 
 type Pipeline struct {
-	registry   *ScannerRegistry
-	rules      *RuleEngine
-	filter     *FindingFilter
-	dedup      *Deduplicator
+	registry *ScannerRegistry
+	rules    *RuleEngine
+	filter   *FindingFilter
+	dedup    *Deduplicator
 }
 
 func NewPipeline(registry *ScannerRegistry, rules *RuleEngine) *Pipeline {

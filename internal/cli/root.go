@@ -52,7 +52,7 @@ EXAMPLES
   deepsec scan ./app --format html --output report.html
 
 Learn more: https://pixelcity.top/deepsec  •  Docs: https://pixelcity.top/docs/deepsec
-Support: enterprise@pixelcity.dev  •  MCP: deepsec mcp start for AI agents`,
+Support: service@pixelcity.dev  •  MCP: deepsec mcp start for AI agents`,
 	Version: version,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		initConfig()

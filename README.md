@@ -265,5 +265,5 @@ deepsec server start --host 0.0.0.0 --port 8443 --tls
 
 ## Contributing & License
 
-Contributions via PR — see `CONTRIBUTING.md`. Security reports to `security@pixelcity.dev`.
+Contributions via PR — see `CONTRIBUTING.md`. Security reports and help: `service@pixelcity.dev`.
 **Apache 2.0** — `LICENSE` — `https://pixelcity.top`
